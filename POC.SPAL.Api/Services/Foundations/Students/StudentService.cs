@@ -1,59 +1,62 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using POC.SPAL.Api.Brokers.DateTimes;
-using POC.SPAL.Api.Brokers.Loggings;
-using POC.SPAL.Api.Brokers.Storages;
+using FluentAssertions;
+using Force.DeepCloner;
+using Moq;
 using POC.SPAL.Api.Models.Students;
+using Xunit;
 
-namespace POC.SPAL.Api.Services.Foundations.Students
+namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
 {
-    public partial class StudentService : IStudentService
+    public partial class StudentServiceTests
     {
-        private readonly IStorageBroker storageBroker;
-        private readonly IDateTimeBroker dateTimeBroker;
-        private readonly ILoggingBroker loggingBroker;
-
-        public StudentService(
-            IStorageBroker storageBroker,
-            IDateTimeBroker dateTimeBroker,
-            ILoggingBroker loggingBroker)
+        [Fact]
+        public async Task ShouldModifyStudentAsync()
         {
-            this.storageBroker = storageBroker;
-            this.dateTimeBroker = dateTimeBroker;
-            this.loggingBroker = loggingBroker;
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            Student randomStudent = CreateRandomModifyStudent(randomDateTimeOffset);
+            Student inputStudent = randomStudent;
+            Student storageStudent = inputStudent.DeepClone();
+            storageStudent.UpdatedDate = randomStudent.CreatedDate;
+            Student updatedStudent = inputStudent;
+            Student expectedStudent = updatedStudent.DeepClone();
+            Guid studentId = inputStudent.Id;
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(randomDateTimeOffset);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectStudentByIdAsync(studentId))
+                    .ReturnsAsync(storageStudent);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.UpdateStudentAsync(inputStudent))
+                    .ReturnsAsync(updatedStudent);
+
+            // when
+            Student actualStudent =
+                await this.studentService.ModifyStudentAsync(inputStudent);
+
+            // then
+            actualStudent.Should().BeEquivalentTo(expectedStudent);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectStudentByIdAsync(inputStudent.Id),
+                    Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.UpdateStudentAsync(inputStudent),
+                    Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
-
-        public ValueTask<Student> AddStudentAsync(Student student) =>
-            TryCatch(async () =>
-            {
-                ValidateStudentOnAdd(student);
-
-                return await this.storageBroker.InsertStudentAsync(student);
-            });
-
-        public IQueryable<Student> RetrieveAllStudents() =>
-            TryCatch(() => this.storageBroker.SelectAllStudents());
-
-        public ValueTask<Student> RetrieveStudentByIdAsync(Guid studentId) =>
-            TryCatch(async () =>
-            {
-                ValidateStudentId(studentId);
-
-                Student maybeStudent = await this.storageBroker
-                    .SelectStudentByIdAsync(studentId);
-
-                ValidateStorageStudent(maybeStudent, studentId);
-
-                return maybeStudent;
-            });
-
-        public ValueTask<Student> ModifyStudentAsync(Student student) =>
-            TryCatch(async () =>
-            {
-                ValidateStudentOnModify(student);
-
-                return await this.storageBroker.UpdateStudentAsync(student);
-            });
     }
 }
