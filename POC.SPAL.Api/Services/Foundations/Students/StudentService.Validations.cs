@@ -77,6 +77,16 @@ namespace POC.SPAL.Api.Services.Foundations.Students
             }
         }
 
+        private static void ValidateAgainstStorageStudentOnModify(Student inputStudent, Student storageStudent)
+        {
+            Validate(
+                (Rule: IsNotSame(
+                    firstDate: inputStudent.CreatedDate,
+                    secondDate: storageStudent.CreatedDate,
+                    secondDateName: nameof(Student.CreatedDate)),
+                Parameter: nameof(Student.CreatedDate)));
+        }
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == Guid.Empty,
