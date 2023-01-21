@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using POC.SPAL.Api.Tests.Acceptance.Models.Students;
@@ -24,6 +26,25 @@ namespace POC.SPAL.Api.Tests.Acceptance.Apis.Students
             // then
             actualStudent.Should().BeEquivalentTo(expectedStudent);
             await this.apiBroker.DeleteStudentByIdAsync(actualStudent.Id);
+        }
+
+        [Fact]
+        public async Task ShouldGetAllStudentsAsync()
+        {
+            // given
+            List<Student> randomStudents = await PostRandomStudentsAsync();
+            List<Student> expectedStudents = randomStudents;
+
+            // when
+            List<Student> actualStudents = await this.apiBroker.GetAllStudentsAsync();
+
+            // then
+            foreach (Student expectedStudent in expectedStudents)
+            {
+                Student actualStudent = actualStudents.Single(approval => approval.Id == expectedStudent.Id);
+                actualStudent.Should().BeEquivalentTo(expectedStudent);
+                await this.apiBroker.DeleteStudentByIdAsync(actualStudent.Id);
+            }
         }
     }
 }
