@@ -38,6 +38,16 @@ namespace POC.SPAL.Api.Services.Foundations.Students
         private void ValidateStudentOnModify(Student student)
         {
             ValidateStudentIsNotNull(student);
+
+            Validate(
+                (Rule: IsInvalid(student.Id), Parameter: nameof(Student.Id)),
+
+                // TODO: Add any other required validation rules
+
+                (Rule: IsInvalid(student.CreatedDate), Parameter: nameof(Student.CreatedDate)),
+                (Rule: IsInvalid(student.CreatedByUserId), Parameter: nameof(Student.CreatedByUserId)),
+                (Rule: IsInvalid(student.UpdatedDate), Parameter: nameof(Student.UpdatedDate)),
+                (Rule: IsInvalid(student.UpdatedByUserId), Parameter: nameof(Student.UpdatedByUserId)));
         }
 
         public void ValidateStudentId(Guid studentId) =>
