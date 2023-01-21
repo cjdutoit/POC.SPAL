@@ -35,6 +35,9 @@ namespace POC.SPAL.Api.Services.Foundations.Students
                 (Rule: IsNotRecent(student.CreatedDate), Parameter: nameof(Student.CreatedDate)));
         }
 
+        public void ValidateStudentId(Guid studentId) =>
+            Validate((Rule: IsInvalid(studentId), Parameter: nameof(Student.Id)));
+
         private static void ValidateStudentIsNotNull(Student student)
         {
             if (student is null)
