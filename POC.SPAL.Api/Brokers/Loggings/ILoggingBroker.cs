@@ -8,5 +8,6 @@ namespace POC.SPAL.Api.Brokers.Loggings
         void LogTrace(string message);
         void LogDebug(string message);
         void LogWarning(string message);
+        void LogError(Exception exception);
     }
 }

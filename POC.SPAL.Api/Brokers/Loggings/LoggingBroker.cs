@@ -21,5 +21,8 @@ namespace POC.SPAL.Api.Brokers.Loggings
 
         public void LogWarning(string message) =>
             this.logger.LogWarning(message);
+
+        public void LogError(Exception exception) =>
+            this.logger.LogError(exception.Message, exception);
     }
 }
