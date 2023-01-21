@@ -54,6 +54,12 @@ namespace POC.SPAL.Api.Services.Foundations.Students
 
                 throw CreateAndLogDependencyValidationException(invalidStudentReferenceException);
             }
+            catch (DbUpdateConcurrencyException dbUpdateConcurrencyException)
+            {
+                var lockedStudentException = new LockedStudentException(dbUpdateConcurrencyException);
+
+                throw CreateAndLogDependencyValidationException(lockedStudentException);
+            }
             catch (DbUpdateException databaseUpdateException)
             {
                 var failedStudentStorageException =
