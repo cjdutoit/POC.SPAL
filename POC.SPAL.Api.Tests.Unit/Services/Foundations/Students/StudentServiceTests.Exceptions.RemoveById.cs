@@ -154,5 +154,48 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRemoveIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            Guid someStudentId = Guid.NewGuid();
+            var serviceException = new Exception();
+
+            var failedStudentServiceException =
+                new FailedStudentServiceException(serviceException);
+
+            var expectedStudentServiceException =
+                new StudentServiceException(failedStudentServiceException);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectStudentByIdAsync(It.IsAny<Guid>()))
+                    .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<Student> removeStudentByIdTask =
+                this.studentService.RemoveStudentByIdAsync(someStudentId);
+
+            StudentServiceException actualStudentServiceException =
+                await Assert.ThrowsAsync<StudentServiceException>(
+                    removeStudentByIdTask.AsTask);
+
+            // then
+            actualStudentServiceException.Should()
+                .BeEquivalentTo(expectedStudentServiceException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectStudentByIdAsync(It.IsAny<Guid>()),
+                        Times.Once());
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedStudentServiceException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
