@@ -1,9 +1,15 @@
+// ---------------------------------------------------------------
+// Copyright (c) Christo du Toit. All rights reserved.
+// Licensed under the MIT License.
+// See License.txt in the project root for license information.
+// ---------------------------------------------------------------
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using RESTFulSense.Exceptions;
 using POC.SPAL.Api.Tests.Acceptance.Models.Students;
+using RESTFulSense.Exceptions;
 using Xunit;
 
 namespace POC.SPAL.Api.Tests.Acceptance.Apis.Students
