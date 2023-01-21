@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using POC.SPAL.Api.Models.Students;
@@ -8,5 +9,6 @@ namespace POC.SPAL.Api.Services.Foundations.Students
     {
         ValueTask<Student> AddStudentAsync(Student student);
         IQueryable<Student> RetrieveAllStudents();
+        ValueTask<Student> RetrieveStudentByIdAsync(Guid studentId);
     }
 }
