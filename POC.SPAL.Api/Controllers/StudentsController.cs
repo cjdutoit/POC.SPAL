@@ -138,5 +138,43 @@ namespace POC.SPAL.Api.Controllers
                 return InternalServerError(studentServiceException);
             }
         }
+
+        [HttpDelete("{studentId}")]
+        public async ValueTask<ActionResult<Student>> DeleteStudentByIdAsync(Guid studentId)
+        {
+            try
+            {
+                Student deletedStudent =
+                    await this.studentService.RemoveStudentByIdAsync(studentId);
+
+                return Ok(deletedStudent);
+            }
+            catch (StudentValidationException studentValidationException)
+                when (studentValidationException.InnerException is NotFoundStudentException)
+            {
+                return NotFound(studentValidationException.InnerException);
+            }
+            catch (StudentValidationException studentValidationException)
+            {
+                return BadRequest(studentValidationException.InnerException);
+            }
+            catch (StudentDependencyValidationException studentDependencyValidationException)
+                when (studentDependencyValidationException.InnerException is LockedStudentException)
+            {
+                return Locked(studentDependencyValidationException.InnerException);
+            }
+            catch (StudentDependencyValidationException studentDependencyValidationException)
+            {
+                return BadRequest(studentDependencyValidationException);
+            }
+            catch (StudentDependencyException studentDependencyException)
+            {
+                return InternalServerError(studentDependencyException);
+            }
+            catch (StudentServiceException studentServiceException)
+            {
+                return InternalServerError(studentServiceException);
+            }
+        }
     }
 }
