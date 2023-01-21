@@ -4,13 +4,12 @@
 // See License.txt in the project root for license information.
 // ---------------------------------------------------------------
 
-using System;
-using Microsoft.AspNetCore.Identity;
+using Xunit;
 
-namespace POC.SPAL.Api.Models.Users
+namespace POC.SPAL.Api.Tests.Acceptance.Brokers
 {
-    public class ApplicationUserClaim : IdentityUserClaim<Guid>
+    [CollectionDefinition(nameof(ApiTestCollection))]
+    public class ApiTestCollection : ICollectionFixture<ApiBroker>
     {
-        public virtual ApplicationUser User { get; set; }
     }
 }

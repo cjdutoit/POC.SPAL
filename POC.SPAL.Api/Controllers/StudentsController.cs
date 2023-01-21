@@ -1,11 +1,17 @@
+// ---------------------------------------------------------------
+// Copyright (c) Christo du Toit. All rights reserved.
+// Licensed under the MIT License.
+// See License.txt in the project root for license information.
+// ---------------------------------------------------------------
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RESTFulSense.Controllers;
 using POC.SPAL.Api.Models.Students;
 using POC.SPAL.Api.Models.Students.Exceptions;
 using POC.SPAL.Api.Services.Foundations.Students;
+using RESTFulSense.Controllers;
 
 namespace POC.SPAL.Api.Controllers
 {

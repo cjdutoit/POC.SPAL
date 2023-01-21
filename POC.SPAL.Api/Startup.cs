@@ -13,6 +13,7 @@ using Microsoft.OpenApi.Models;
 using POC.SPAL.Api.Brokers.DateTimes;
 using POC.SPAL.Api.Brokers.Loggings;
 using POC.SPAL.Api.Brokers.Storages;
+using POC.SPAL.Api.Services.Foundations.Students;
 
 namespace POC.SPAL.Api
 {
@@ -56,6 +57,7 @@ namespace POC.SPAL.Api
 
         private static void AddServices(IServiceCollection services)
         {
+            services.AddTransient<IStudentService, StudentService>();
         }
 
         private static void AddBrokers(IServiceCollection services)
