@@ -209,7 +209,8 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                     modifyStudentTask.AsTask);
 
             // then
-            actualStudentValidationException.Should().BeEquivalentTo(expectedStudentValidatonException);
+            actualStudentValidationException.Should()
+                .BeEquivalentTo(expectedStudentValidatonException);
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetCurrentDateTimeOffset(),
@@ -227,6 +228,59 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnModifyIfStudentDoesNotExistAndLogItAsync()
+        {
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            Student randomStudent = CreateRandomModifyStudent(randomDateTimeOffset);
+            Student nonExistStudent = randomStudent;
+            Student nullStudent = null;
+
+            var notFoundStudentException =
+                new NotFoundStudentException(nonExistStudent.Id);
+
+            var expectedStudentValidationException =
+                new StudentValidationException(notFoundStudentException);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectStudentByIdAsync(nonExistStudent.Id))
+                .ReturnsAsync(nullStudent);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                .Returns(randomDateTimeOffset);
+
+            // when 
+            ValueTask<Student> modifyStudentTask =
+                this.studentService.ModifyStudentAsync(nonExistStudent);
+
+            StudentValidationException actualStudentValidationException =
+                await Assert.ThrowsAsync<StudentValidationException>(
+                    modifyStudentTask.AsTask);
+
+            // then
+            actualStudentValidationException.Should()
+                .BeEquivalentTo(expectedStudentValidationException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectStudentByIdAsync(nonExistStudent.Id),
+                    Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedStudentValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }
