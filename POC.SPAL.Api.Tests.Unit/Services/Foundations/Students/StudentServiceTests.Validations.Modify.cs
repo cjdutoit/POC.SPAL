@@ -173,9 +173,9 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 broker.SelectStudentByIdAsync(invalidStudent.Id),
                     Times.Never);
 
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Theory]
@@ -279,8 +279,8 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                     expectedStudentValidationException))),
                         Times.Once);
 
-            this.storageBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -338,8 +338,65 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                    expectedStudentValidationException))),
                        Times.Once);
 
-            this.storageBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnModifyIfCreatedUserIdDontMacthStorageAndLogItAsync()
+        {
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            Student randomStudent = CreateRandomModifyStudent(randomDateTimeOffset);
+            Student invalidStudent = randomStudent.DeepClone();
+            Student storageStudent = invalidStudent.DeepClone();
+            invalidStudent.CreatedByUserId = Guid.NewGuid();
+            storageStudent.UpdatedDate = storageStudent.CreatedDate;
+
+            var invalidStudentException = new InvalidStudentException();
+
+            invalidStudentException.AddData(
+                key: nameof(Student.CreatedByUserId),
+                values: $"Id is not the same as {nameof(Student.CreatedByUserId)}");
+
+            var expectedStudentValidationException =
+                new StudentValidationException(invalidStudentException);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectStudentByIdAsync(invalidStudent.Id))
+                .ReturnsAsync(storageStudent);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<Student> modifyStudentTask =
+                this.studentService.ModifyStudentAsync(invalidStudent);
+
+            StudentValidationException actualStudentValidationException =
+                await Assert.ThrowsAsync<StudentValidationException>(
+                    modifyStudentTask.AsTask);
+
+            // then
+            actualStudentValidationException.Should().BeEquivalentTo(expectedStudentValidationException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectStudentByIdAsync(invalidStudent.Id),
+                    Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+               broker.LogError(It.Is(SameExceptionAs(
+                   expectedStudentValidationException))),
+                       Times.Once);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
