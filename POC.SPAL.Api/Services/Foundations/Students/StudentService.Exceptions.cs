@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using POC.SPAL.Api.Models.Students;
 using POC.SPAL.Api.Models.Students.Exceptions;
 using Xeptions;
@@ -46,6 +47,13 @@ namespace POC.SPAL.Api.Services.Foundations.Students
 
                 throw CreateAndLogDependencyValidationException(invalidStudentReferenceException);
             }
+            catch (DbUpdateException databaseUpdateException)
+            {
+                var failedStudentStorageException =
+                    new FailedStudentStorageException(databaseUpdateException);
+
+                throw CreateAndLogDependencyException(failedStudentStorageException);
+            }
         }
 
         private StudentValidationException CreateAndLogValidationException(Xeption exception)
@@ -74,6 +82,15 @@ namespace POC.SPAL.Api.Services.Foundations.Students
             this.loggingBroker.LogError(studentDependencyValidationException);
 
             return studentDependencyValidationException;
+        }
+
+        private StudentDependencyException CreateAndLogDependencyException(
+            Xeption exception)
+        {
+            var studentDependencyException = new StudentDependencyException(exception);
+            this.loggingBroker.LogError(studentDependencyException);
+
+            return studentDependencyException;
         }
     }
 }
