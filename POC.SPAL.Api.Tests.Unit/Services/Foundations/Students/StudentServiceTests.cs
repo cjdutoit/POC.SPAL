@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using Moq;
 using POC.SPAL.Api.Brokers.DateTimes;
 using POC.SPAL.Api.Brokers.Loggings;
@@ -6,6 +7,7 @@ using POC.SPAL.Api.Brokers.Storages;
 using POC.SPAL.Api.Models.Students;
 using POC.SPAL.Api.Services.Foundations.Students;
 using Tynamix.ObjectFiller;
+using Xeptions;
 
 namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
 {
@@ -27,6 +29,9 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 dateTimeBroker: this.dateTimeBrokerMock.Object,
                 loggingBroker: this.loggingBrokerMock.Object);
         }
+
+        private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+            actualException => actualException.SameExceptionAs(expectedException);
 
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: new DateTime()).GetValue();
