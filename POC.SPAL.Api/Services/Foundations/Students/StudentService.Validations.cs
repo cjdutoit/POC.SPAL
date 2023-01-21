@@ -38,6 +38,14 @@ namespace POC.SPAL.Api.Services.Foundations.Students
         public void ValidateStudentId(Guid studentId) =>
             Validate((Rule: IsInvalid(studentId), Parameter: nameof(Student.Id)));
 
+        private static void ValidateStorageStudent(Student maybeStudent, Guid studentId)
+        {
+            if (maybeStudent is null)
+            {
+                throw new NotFoundStudentException(studentId);
+            }
+        }
+
         private static void ValidateStudentIsNotNull(Student student)
         {
             if (student is null)
