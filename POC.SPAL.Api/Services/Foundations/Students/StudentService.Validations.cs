@@ -30,7 +30,9 @@ namespace POC.SPAL.Api.Services.Foundations.Students
                     firstId: student.UpdatedByUserId,
                     secondId: student.CreatedByUserId,
                     secondIdName: nameof(Student.CreatedByUserId)),
-                Parameter: nameof(Student.UpdatedByUserId)));
+                Parameter: nameof(Student.UpdatedByUserId)),
+
+                (Rule: IsNotRecent(student.CreatedDate), Parameter: nameof(Student.CreatedDate)));
         }
 
         private static void ValidateStudentIsNotNull(Student student)
@@ -70,6 +72,23 @@ namespace POC.SPAL.Api.Services.Foundations.Students
                 Condition = firstId != secondId,
                 Message = $"Id is not the same as {secondIdName}"
             };
+
+        private dynamic IsNotRecent(DateTimeOffset date) => new
+        {
+            Condition = IsDateNotRecent(date),
+            Message = "Date is not recent"
+        };
+
+        private bool IsDateNotRecent(DateTimeOffset date)
+        {
+            DateTimeOffset currentDateTime =
+                this.dateTimeBroker.GetCurrentDateTimeOffset();
+
+            TimeSpan timeDifference = currentDateTime.Subtract(date);
+            TimeSpan oneMinute = TimeSpan.FromMinutes(1);
+
+            return timeDifference.Duration() > oneMinute;
+        }
 
         private static void Validate(params (dynamic Rule, string Parameter)[] validations)
         {

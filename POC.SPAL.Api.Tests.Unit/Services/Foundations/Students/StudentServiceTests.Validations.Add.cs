@@ -27,8 +27,8 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 this.studentService.AddStudentAsync(nullStudent);
 
             StudentValidationException actualStudentValidationException =
-                await Assert.ThrowsAsync<StudentValidationException>(
-                    addStudentTask.AsTask);
+                await Assert.ThrowsAsync<StudentValidationException>(() =>
+                    addStudentTask.AsTask());
 
             // then
             actualStudentValidationException.Should()
@@ -93,12 +93,16 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 this.studentService.AddStudentAsync(invalidStudent);
 
             StudentValidationException actualStudentValidationException =
-                await Assert.ThrowsAsync<StudentValidationException>(
-                    addStudentTask.AsTask);
+                await Assert.ThrowsAsync<StudentValidationException>(() =>
+                    addStudentTask.AsTask());
 
             // then
             actualStudentValidationException.Should()
                 .BeEquivalentTo(expectedStudentValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once());
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
@@ -135,17 +139,25 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             var expectedStudentValidationException =
                 new StudentValidationException(invalidStudentException);
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(randomDateTimeOffset);
+
             // when
             ValueTask<Student> addStudentTask =
                 this.studentService.AddStudentAsync(invalidStudent);
 
             StudentValidationException actualStudentValidationException =
-                await Assert.ThrowsAsync<StudentValidationException>(
-                    addStudentTask.AsTask);
+                await Assert.ThrowsAsync<StudentValidationException>(() =>
+                    addStudentTask.AsTask());
 
             // then
             actualStudentValidationException.Should()
                 .BeEquivalentTo(expectedStudentValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once());
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
@@ -156,9 +168,9 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 broker.InsertStudentAsync(It.IsAny<Student>()),
                     Times.Never);
 
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -180,17 +192,25 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             var expectedStudentValidationException =
                 new StudentValidationException(invalidStudentException);
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(randomDateTimeOffset);
+
             // when
             ValueTask<Student> addStudentTask =
                 this.studentService.AddStudentAsync(invalidStudent);
 
             StudentValidationException actualStudentValidationException =
-                await Assert.ThrowsAsync<StudentValidationException>(
-                    addStudentTask.AsTask);
+                await Assert.ThrowsAsync<StudentValidationException>(() =>
+                    addStudentTask.AsTask());
 
             // then
             actualStudentValidationException.Should()
                 .BeEquivalentTo(expectedStudentValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once());
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
@@ -239,8 +259,8 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 this.studentService.AddStudentAsync(invalidStudent);
 
             StudentValidationException actualStudentValidationException =
-                await Assert.ThrowsAsync<StudentValidationException>(
-                    addStudentTask.AsTask);
+                await Assert.ThrowsAsync<StudentValidationException>(() =>
+                    addStudentTask.AsTask());
 
             // then
             actualStudentValidationException.Should()
