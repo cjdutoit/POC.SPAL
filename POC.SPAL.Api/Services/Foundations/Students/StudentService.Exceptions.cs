@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
@@ -12,6 +13,7 @@ namespace POC.SPAL.Api.Services.Foundations.Students
     public partial class StudentService
     {
         private delegate ValueTask<Student> ReturningStudentFunction();
+        private delegate IQueryable<Student> ReturningStudentsFunction();
 
         private async ValueTask<Student> TryCatch(ReturningStudentFunction returningStudentFunction)
         {
@@ -61,6 +63,20 @@ namespace POC.SPAL.Api.Services.Foundations.Students
                     new FailedStudentServiceException(exception);
 
                 throw CreateAndLogServiceException(failedStudentServiceException);
+            }
+        }
+
+        private IQueryable<Student> TryCatch(ReturningStudentsFunction returningStudentsFunction)
+        {
+            try
+            {
+                return returningStudentsFunction();
+            }
+            catch (SqlException sqlException)
+            {
+                var failedStudentStorageException =
+                    new FailedStudentStorageException(sqlException);
+                throw CreateAndLogCriticalDependencyException(failedStudentStorageException);
             }
         }
 
