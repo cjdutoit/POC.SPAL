@@ -84,7 +84,13 @@ namespace POC.SPAL.Api.Services.Foundations.Students
                     firstDate: inputStudent.CreatedDate,
                     secondDate: storageStudent.CreatedDate,
                     secondDateName: nameof(Student.CreatedDate)),
-                Parameter: nameof(Student.CreatedDate)));
+                Parameter: nameof(Student.CreatedDate)),
+
+                (Rule: IsNotSame(
+                    firstId: inputStudent.CreatedByUserId,
+                    secondId: storageStudent.CreatedByUserId,
+                    secondIdName: nameof(Student.CreatedByUserId)),
+                Parameter: nameof(Student.CreatedByUserId)));
         }
 
         private static dynamic IsInvalid(Guid id) => new
