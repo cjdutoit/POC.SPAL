@@ -24,7 +24,13 @@ namespace POC.SPAL.Api.Services.Foundations.Students
                     firstDate: student.UpdatedDate,
                     secondDate: student.CreatedDate,
                     secondDateName: nameof(Student.CreatedDate)),
-                Parameter: nameof(Student.UpdatedDate)));
+                Parameter: nameof(Student.UpdatedDate)),
+
+                (Rule: IsNotSame(
+                    firstId: student.UpdatedByUserId,
+                    secondId: student.CreatedByUserId,
+                    secondIdName: nameof(Student.CreatedByUserId)),
+                Parameter: nameof(Student.UpdatedByUserId)));
         }
 
         private static void ValidateStudentIsNotNull(Student student)
@@ -54,6 +60,15 @@ namespace POC.SPAL.Api.Services.Foundations.Students
             {
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as {secondDateName}"
+            };
+
+        private static dynamic IsNotSame(
+            Guid firstId,
+            Guid secondId,
+            string secondIdName) => new
+            {
+                Condition = firstId != secondId,
+                Message = $"Id is not the same as {secondIdName}"
             };
 
         private static void Validate(params (dynamic Rule, string Parameter)[] validations)
