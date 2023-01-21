@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using FluentAssertions;
@@ -208,6 +209,57 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedStudentDependencyValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.UpdateStudentAsync(randomStudent),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnModifyIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            Student randomStudent = CreateRandomStudent();
+            var serviceException = new Exception();
+
+            var failedStudentServiceException =
+                new FailedStudentServiceException(serviceException);
+
+            var expectedStudentServiceException =
+                new StudentServiceException(failedStudentServiceException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Throws(serviceException);
+
+            // when
+            ValueTask<Student> modifyStudentTask =
+                this.studentService.ModifyStudentAsync(randomStudent);
+
+            StudentServiceException actualStudentServiceException =
+                await Assert.ThrowsAsync<StudentServiceException>(
+                    modifyStudentTask.AsTask);
+
+            // then
+            actualStudentServiceException.Should()
+                .BeEquivalentTo(expectedStudentServiceException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectStudentByIdAsync(randomStudent.Id),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedStudentServiceException))),
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
