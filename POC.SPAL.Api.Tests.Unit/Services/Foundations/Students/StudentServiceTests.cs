@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Microsoft.Data.SqlClient;
@@ -62,6 +63,13 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
 
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: new DateTime()).GetValue();
+
+        private static IQueryable<Student> CreateRandomStudents()
+        {
+            return CreateStudentFiller(dateTimeOffset: GetRandomDateTimeOffset())
+                .Create(count: GetRandomNumber())
+                    .AsQueryable();
+        }
 
         private static Student CreateRandomStudent() =>
             CreateStudentFiller(dateTimeOffset: GetRandomDateTimeOffset()).Create();

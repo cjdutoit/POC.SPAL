@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using POC.SPAL.Api.Brokers.DateTimes;
 using POC.SPAL.Api.Brokers.Loggings;
@@ -29,5 +30,8 @@ namespace POC.SPAL.Api.Services.Foundations.Students
 
                 return await this.storageBroker.InsertStudentAsync(student);
             });
+
+        public IQueryable<Student> RetrieveAllStudents() =>
+            throw new System.NotImplementedException();
     }
 }
