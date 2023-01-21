@@ -48,5 +48,73 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public async Task ShouldThrowValidationExceptionOnModifyIfStudentIsInvalidAndLogItAsync(string invalidText)
+        {
+            // given 
+            var invalidStudent = new Student
+            {
+                // TODO:  Add default values for your properties i.e. Name = invalidText
+            };
+
+            var invalidStudentException = new InvalidStudentException();
+
+            invalidStudentException.AddData(
+                key: nameof(Student.Id),
+                values: "Id is required");
+
+            //invalidStudentException.AddData(
+            //    key: nameof(Student.Name),
+            //    values: "Text is required");
+
+            // TODO: Add or remove data here to suit the validation needs for the Student model
+
+            invalidStudentException.AddData(
+                key: nameof(Student.CreatedDate),
+                values: "Date is required");
+
+            invalidStudentException.AddData(
+                key: nameof(Student.CreatedByUserId),
+                values: "Id is required");
+
+            invalidStudentException.AddData(
+                key: nameof(Student.UpdatedDate),
+                values: "Date is required");
+
+            invalidStudentException.AddData(
+                key: nameof(Student.UpdatedByUserId),
+                values: "Id is required");
+
+            var expectedStudentValidationException =
+                new StudentValidationException(invalidStudentException);
+
+            // when
+            ValueTask<Student> modifyStudentTask =
+                this.studentService.ModifyStudentAsync(invalidStudent);
+
+            StudentValidationException actualStudentValidationException =
+                await Assert.ThrowsAsync<StudentValidationException>(
+                    modifyStudentTask.AsTask);
+
+            //then
+            actualStudentValidationException.Should().BeEquivalentTo(expectedStudentValidationException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedStudentValidationException))),
+                        Times.Once());
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.UpdateStudentAsync(It.IsAny<Student>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
