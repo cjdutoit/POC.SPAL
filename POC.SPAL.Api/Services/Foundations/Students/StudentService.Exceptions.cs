@@ -78,6 +78,13 @@ namespace POC.SPAL.Api.Services.Foundations.Students
                     new FailedStudentStorageException(sqlException);
                 throw CreateAndLogCriticalDependencyException(failedStudentStorageException);
             }
+            catch (Exception exception)
+            {
+                var failedStudentServiceException =
+                    new FailedStudentServiceException(exception);
+
+                throw CreateAndLogServiceException(failedStudentServiceException);
+            }
         }
 
         private StudentValidationException CreateAndLogValidationException(Xeption exception)
