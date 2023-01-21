@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using RESTFulSense.Exceptions;
 using POC.SPAL.Api.Tests.Acceptance.Models.Students;
 using Xunit;
 
@@ -76,6 +77,28 @@ namespace POC.SPAL.Api.Tests.Acceptance.Apis.Students
             // then
             actualStudent.Should().BeEquivalentTo(modifiedStudent);
             await this.apiBroker.DeleteStudentByIdAsync(actualStudent.Id);
+        }
+
+        [Fact]
+        public async Task ShouldDeleteStudentAsync()
+        {
+            // given
+            Student randomStudent = await PostRandomStudentAsync();
+            Student inputStudent = randomStudent;
+            Student expectedStudent = inputStudent;
+
+            // when
+            Student deletedStudent =
+                await this.apiBroker.DeleteStudentByIdAsync(inputStudent.Id);
+
+            ValueTask<Student> getStudentbyIdTask =
+                this.apiBroker.GetStudentByIdAsync(inputStudent.Id);
+
+            // then
+            deletedStudent.Should().BeEquivalentTo(expectedStudent);
+
+            await Assert.ThrowsAsync<HttpResponseNotFoundException>(() =>
+                getStudentbyIdTask.AsTask());
         }
     }
 }
