@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RESTFulSense.Controllers;
@@ -39,6 +40,26 @@ namespace POC.SPAL.Api.Controllers
                when (studentDependencyValidationException.InnerException is AlreadyExistsStudentException)
             {
                 return Conflict(studentDependencyValidationException.InnerException);
+            }
+            catch (StudentDependencyException studentDependencyException)
+            {
+                return InternalServerError(studentDependencyException);
+            }
+            catch (StudentServiceException studentServiceException)
+            {
+                return InternalServerError(studentServiceException);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult<IQueryable<Student>> GetAllStudents()
+        {
+            try
+            {
+                IQueryable<Student> retrievedStudents =
+                    this.studentService.RetrieveAllStudents();
+
+                return Ok(retrievedStudents);
             }
             catch (StudentDependencyException studentDependencyException)
             {
