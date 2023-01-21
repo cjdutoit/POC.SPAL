@@ -32,6 +32,6 @@ namespace POC.SPAL.Api.Services.Foundations.Students
             });
 
         public IQueryable<Student> RetrieveAllStudents() =>
-            throw new System.NotImplementedException();
+            this.storageBroker.SelectAllStudents();
     }
 }
