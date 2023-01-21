@@ -62,7 +62,12 @@ namespace POC.SPAL.Api.Services.Foundations.Students
                 return await this.storageBroker.UpdateStudentAsync(student);
             });
 
-        public ValueTask<Student> RemoveStudentByIdAsync(Guid studentId) =>
-            throw new NotImplementedException();
+        public async ValueTask<Student> RemoveStudentByIdAsync(Guid studentId)
+        {
+            Student maybeStudent = await this.storageBroker
+                    .SelectStudentByIdAsync(studentId);
+
+            return await this.storageBroker.DeleteStudentAsync(maybeStudent);
+        }
     }
 }
