@@ -109,6 +109,10 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             actualStudentValidationException.Should()
                 .BeEquivalentTo(expectedStudentValidationException);
 
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedStudentValidationException))),
@@ -118,9 +122,9 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 broker.UpdateStudentAsync(It.IsAny<Student>()),
                     Times.Never);
 
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -139,6 +143,10 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             var expectedStudentValidationException =
                 new StudentValidationException(invalidStudentException);
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(randomDateTimeOffset);
+
             // when
             ValueTask<Student> modifyStudentTask =
                 this.studentService.ModifyStudentAsync(invalidStudent);
@@ -151,6 +159,10 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             actualStudentValidationException.Should()
                 .BeEquivalentTo(expectedStudentValidationException);
 
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedStudentValidationException))),
@@ -160,9 +172,9 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 broker.SelectStudentByIdAsync(invalidStudent.Id),
                     Times.Never);
 
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Theory]
