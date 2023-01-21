@@ -22,7 +22,12 @@ namespace POC.SPAL.Api.Services.Foundations.Students
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask<Student> AddStudentAsync(Student student) =>
-            await this.storageBroker.InsertStudentAsync(student);
+        public ValueTask<Student> AddStudentAsync(Student student) =>
+            TryCatch(async () =>
+            {
+                ValidateStudentOnAdd(student);
+
+                return await this.storageBroker.InsertStudentAsync(student);
+            });
     }
 }
