@@ -7,8 +7,17 @@ namespace POC.SPAL.Api.Brokers.Storages
     {
         private static void AddStudentConfigurations(ModelBuilder modelBuilder)
         {
-            // TODO: Add your fluent configurations here
-            // TODO: Call this method from StorageBroker.cs OnModelCreating method
+            modelBuilder.Entity<Student>()
+                .Property(student => student.IdentityNumber)
+                .IsRequired();
+
+            modelBuilder.Entity<Student>()
+                .Property(student => student.FirstName)
+                .IsRequired();
+
+            modelBuilder.Entity<Student>()
+                .Property(student => student.LastName)
+                .IsRequired();
         }
     }
 }

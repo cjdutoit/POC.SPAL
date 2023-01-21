@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using POC.SPAL.Api.Brokers.DateTimes;
+using POC.SPAL.Api.Brokers.Loggings;
 using POC.SPAL.Api.Brokers.Storages;
 
 namespace POC.SPAL.Api
@@ -58,6 +60,9 @@ namespace POC.SPAL.Api
 
         private static void AddBrokers(IServiceCollection services)
         {
+            services.AddTransient<IDateTimeBroker, DateTimeBroker>();
+            services.AddTransient<ILoggingBroker, LoggingBroker>();
+            services.AddTransient<IStorageBroker, StorageBroker>();
         }
     }
 }
