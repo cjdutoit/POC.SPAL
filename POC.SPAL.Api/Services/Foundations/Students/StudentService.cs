@@ -35,7 +35,7 @@ namespace POC.SPAL.Api.Services.Foundations.Students
         public IQueryable<Student> RetrieveAllStudents() =>
             TryCatch(() => this.storageBroker.SelectAllStudents());
 
-        public ValueTask<Student> RetrieveStudentByIdAsync(Guid studentId) =>
-            throw new NotImplementedException();
+        public async ValueTask<Student> RetrieveStudentByIdAsync(Guid studentId) =>
+            await this.storageBroker.SelectStudentByIdAsync(studentId);
     }
 }
