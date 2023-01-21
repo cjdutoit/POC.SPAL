@@ -6,6 +6,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +15,9 @@ using POC.SPAL.Api.Brokers.DateTimes;
 using POC.SPAL.Api.Brokers.Loggings;
 using POC.SPAL.Api.Brokers.Storages;
 using POC.SPAL.Api.Services.Foundations.Students;
+using Standard.Providers.Storage;
+using Standard.Providers.Storage.Abstraction;
+using Standard.Providers.Storage.EntityFramework;
 
 namespace POC.SPAL.Api
 {
@@ -30,7 +34,13 @@ namespace POC.SPAL.Api
         {
             services.AddLogging();
             services.AddControllers();
-            services.AddDbContext<StorageBroker>();
+
+            services.AddDbContext<EntityFrameworkStorageProvider>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString(name: "DefaultConnection")));
+
+            //services.AddDbContext<EntityFrameworkStorageProvider>(options =>
+            //    options.UseInMemoryDatabase(databaseName: "SPAL"));
+
             AddBrokers(services);
             AddServices(services);
 
@@ -57,6 +67,8 @@ namespace POC.SPAL.Api
 
         private static void AddServices(IServiceCollection services)
         {
+            services.AddTransient<IStorageAbstractProvider, StorageAbstractProvider>();
+            services.AddTransient<IStorageProvider, EntityFrameworkStorageProvider>();
             services.AddTransient<IStudentService, StudentService>();
         }
 

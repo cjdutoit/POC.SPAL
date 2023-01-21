@@ -7,9 +7,9 @@
 using Microsoft.EntityFrameworkCore;
 using Standard.Providers.Storage.EntityFramework.Models.Students;
 
-namespace POC.SPAL.Api.Brokers.Storages
+namespace Standard.Providers.Storage.EntityFramework
 {
-    public partial class StorageBroker
+    public partial class EntityFrameworkStorageProvider
     {
         private static void AddStudentConfigurations(ModelBuilder modelBuilder)
         {

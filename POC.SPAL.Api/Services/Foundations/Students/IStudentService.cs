@@ -7,7 +7,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using POC.SPAL.Api.Models.Students;
+using Standard.Providers.Storage.EntityFramework.Models.Students;
 
 namespace POC.SPAL.Api.Services.Foundations.Students
 {

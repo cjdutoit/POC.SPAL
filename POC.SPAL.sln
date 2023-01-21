@@ -3,19 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33209.295
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POC.SPAL.Api", "POC.SPAL.Api\POC.SPAL.Api.csproj", "{A3108E9F-732C-4993-AFB2-F5911ABBA993}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "POC.SPAL.Api", "POC.SPAL.Api\POC.SPAL.Api.csproj", "{A3108E9F-732C-4993-AFB2-F5911ABBA993}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POC.SPAL.Api.Tests.Unit", "POC.SPAL.Api.Tests.Unit\POC.SPAL.Api.Tests.Unit.csproj", "{076E6262-4B34-4694-9D07-79FFF4529896}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "POC.SPAL.Api.Tests.Unit", "POC.SPAL.Api.Tests.Unit\POC.SPAL.Api.Tests.Unit.csproj", "{076E6262-4B34-4694-9D07-79FFF4529896}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POC.SPAL.Api.Tests.Acceptance", "POC.SPAL.Api.Tests.Acceptance\POC.SPAL.Api.Tests.Acceptance.csproj", "{0C88F515-D50F-4A2D-B68E-B99201E296FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "POC.SPAL.Api.Tests.Acceptance", "POC.SPAL.Api.Tests.Acceptance\POC.SPAL.Api.Tests.Acceptance.csproj", "{0C88F515-D50F-4A2D-B68E-B99201E296FB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{98A162AE-DDE6-47D5-8580-9A8D40A3CE8F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProviderAbstraction", "ProviderAbstraction", "{04CCC6A6-DFA1-4802-93CE-A199BAF7411E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Standard.Providers.Storage", "Standard.Providers.Storage\Standard.Providers.Storage.csproj", "{9A69C949-7368-4477-B077-A995046574EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Standard.Providers.Storage", "Standard.Providers.Storage\Standard.Providers.Storage.csproj", "{9A69C949-7368-4477-B077-A995046574EE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Standard.Providers.Storage.EntityFramework", "Standard.Providers.Storage.EntityFramework\Standard.Providers.Storage.EntityFramework.csproj", "{37E55809-FA80-4C66-8D1E-0CECFC7CC211}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Standard.Providers.Storage.Abstraction", "Standard.Providers.Storage.Abstraction\Standard.Providers.Storage.Abstraction.csproj", "{4F764F58-76CF-48A3-913D-CCD572BAFF52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{37E55809-FA80-4C66-8D1E-0CECFC7CC211}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37E55809-FA80-4C66-8D1E-0CECFC7CC211}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37E55809-FA80-4C66-8D1E-0CECFC7CC211}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F764F58-76CF-48A3-913D-CCD572BAFF52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F764F58-76CF-48A3-913D-CCD572BAFF52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F764F58-76CF-48A3-913D-CCD572BAFF52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F764F58-76CF-48A3-913D-CCD572BAFF52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{0C88F515-D50F-4A2D-B68E-B99201E296FB} = {98A162AE-DDE6-47D5-8580-9A8D40A3CE8F}
 		{9A69C949-7368-4477-B077-A995046574EE} = {04CCC6A6-DFA1-4802-93CE-A199BAF7411E}
 		{37E55809-FA80-4C66-8D1E-0CECFC7CC211} = {04CCC6A6-DFA1-4802-93CE-A199BAF7411E}
+		{4F764F58-76CF-48A3-913D-CCD572BAFF52} = {04CCC6A6-DFA1-4802-93CE-A199BAF7411E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4222F637-3D2E-4F26-B2F7-AB61F9B007CE}
