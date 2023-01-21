@@ -1,3 +1,9 @@
+// ---------------------------------------------------------------
+// Copyright (c) Christo du Toit. All rights reserved.
+// Licensed under the MIT License.
+// See License.txt in the project root for license information.
+// ---------------------------------------------------------------
+
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -53,7 +59,9 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             // given
             var invalidStudent = new Student
             {
-                // TODO:  Add default values for your properties i.e. Name = invalidText
+                IdentityNumber = invalidText,
+                FirstName = invalidText,
+                LastName = invalidText,
             };
 
             var invalidStudentException =
@@ -63,11 +71,17 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                 key: nameof(Student.Id),
                 values: "Id is required");
 
-            //invalidStudentException.AddData(
-            //    key: nameof(Student.Name),
-            //    values: "Text is required");
+            invalidStudentException.AddData(
+                key: nameof(Student.IdentityNumber),
+                values: "Text is required");
 
-            // TODO: Add or remove data here to suit the validation needs for the Student model
+            invalidStudentException.AddData(
+                key: nameof(Student.FirstName),
+                values: "Text is required");
+
+            invalidStudentException.AddData(
+                key: nameof(Student.LastName),
+                values: "Text is required");
 
             invalidStudentException.AddData(
                 key: nameof(Student.CreatedDate),
