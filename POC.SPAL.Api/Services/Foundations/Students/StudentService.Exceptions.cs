@@ -39,6 +39,13 @@ namespace POC.SPAL.Api.Services.Foundations.Students
 
                 throw CreateAndLogDependencyValidationException(alreadyExistsStudentException);
             }
+            catch (ForeignKeyConstraintConflictException foreignKeyConstraintConflictException)
+            {
+                var invalidStudentReferenceException =
+                    new InvalidStudentReferenceException(foreignKeyConstraintConflictException);
+
+                throw CreateAndLogDependencyValidationException(invalidStudentReferenceException);
+            }
         }
 
         private StudentValidationException CreateAndLogValidationException(Xeption exception)
