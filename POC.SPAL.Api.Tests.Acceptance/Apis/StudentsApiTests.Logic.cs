@@ -61,5 +61,21 @@ namespace POC.SPAL.Api.Tests.Acceptance.Apis.Students
             actualStudent.Should().BeEquivalentTo(expectedStudent);
             await this.apiBroker.DeleteStudentByIdAsync(actualStudent.Id);
         }
+
+        [Fact]
+        public async Task ShouldPutStudentAsync()
+        {
+            // given
+            Student randomStudent = await PostRandomStudentAsync();
+            Student modifiedStudent = UpdateStudentWithRandomValues(randomStudent);
+
+            // when
+            await this.apiBroker.PutStudentAsync(modifiedStudent);
+            Student actualStudent = await this.apiBroker.GetStudentByIdAsync(randomStudent.Id);
+
+            // then
+            actualStudent.Should().BeEquivalentTo(modifiedStudent);
+            await this.apiBroker.DeleteStudentByIdAsync(actualStudent.Id);
+        }
     }
 }

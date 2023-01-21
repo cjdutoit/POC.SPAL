@@ -19,6 +19,24 @@ namespace POC.SPAL.Api.Tests.Acceptance.Apis.Students
         private int GetRandomNumber() =>
             new IntRange(min: 2, max: 10).GetValue();
 
+        private static DateTimeOffset GetRandomDateTime() =>
+            new DateTimeRange(earliestDate: new DateTime()).GetValue();
+
+        private static Student UpdateStudentWithRandomValues(Student inputStudent)
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            var filler = new Filler<Student>();
+
+            filler.Setup()
+                .OnProperty(student => student.Id).Use(inputStudent.Id)
+                .OnType<DateTimeOffset>().Use(GetRandomDateTime())
+                .OnProperty(student => student.CreatedDate).Use(inputStudent.CreatedDate)
+                .OnProperty(student => student.CreatedByUserId).Use(inputStudent.CreatedByUserId)
+                .OnProperty(student => student.UpdatedDate).Use(now);
+
+            return filler.Create();
+        }
+
         private async ValueTask<Student> PostRandomStudentAsync()
         {
             Student randomStudent = CreateRandomStudent();
