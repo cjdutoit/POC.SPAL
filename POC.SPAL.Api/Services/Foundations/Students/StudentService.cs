@@ -22,7 +22,7 @@ namespace POC.SPAL.Api.Services.Foundations.Students
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<Student> AddStudentAsync(Student student) =>
-            throw new System.NotImplementedException();
+        public async ValueTask<Student> AddStudentAsync(Student student) =>
+            await this.storageBroker.InsertStudentAsync(student);
     }
 }
