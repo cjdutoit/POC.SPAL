@@ -99,5 +99,44 @@ namespace POC.SPAL.Api.Controllers
                 return InternalServerError(studentServiceException);
             }
         }
+
+        [HttpPut]
+        public async ValueTask<ActionResult<Student>> PutStudentAsync(Student student)
+        {
+            try
+            {
+                Student modifiedStudent =
+                    await this.studentService.ModifyStudentAsync(student);
+
+                return Ok(modifiedStudent);
+            }
+            catch (StudentValidationException studentValidationException)
+                when (studentValidationException.InnerException is NotFoundStudentException)
+            {
+                return NotFound(studentValidationException.InnerException);
+            }
+            catch (StudentValidationException studentValidationException)
+            {
+                return BadRequest(studentValidationException.InnerException);
+            }
+            catch (StudentDependencyValidationException studentValidationException)
+                when (studentValidationException.InnerException is InvalidStudentReferenceException)
+            {
+                return FailedDependency(studentValidationException.InnerException);
+            }
+            catch (StudentDependencyValidationException studentDependencyValidationException)
+               when (studentDependencyValidationException.InnerException is AlreadyExistsStudentException)
+            {
+                return Conflict(studentDependencyValidationException.InnerException);
+            }
+            catch (StudentDependencyException studentDependencyException)
+            {
+                return InternalServerError(studentDependencyException);
+            }
+            catch (StudentServiceException studentServiceException)
+            {
+                return InternalServerError(studentServiceException);
+            }
+        }
     }
 }
