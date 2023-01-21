@@ -106,7 +106,8 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                     modifyStudentTask.AsTask);
 
             //then
-            actualStudentValidationException.Should().BeEquivalentTo(expectedStudentValidationException);
+            actualStudentValidationException.Should()
+                .BeEquivalentTo(expectedStudentValidationException);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
@@ -147,7 +148,8 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
                     modifyStudentTask.AsTask);
 
             // then
-            actualStudentValidationException.Should().BeEquivalentTo(expectedStudentValidationException);
+            actualStudentValidationException.Should()
+                .BeEquivalentTo(expectedStudentValidationException);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
@@ -161,6 +163,58 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Theory]
+        [MemberData(nameof(MinutesBeforeOrAfter))]
+        public async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsNotRecentAndLogItAsync(int minutes)
+        {
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            Student randomStudent = CreateRandomStudent(randomDateTimeOffset);
+            randomStudent.UpdatedDate = randomDateTimeOffset.AddMinutes(minutes);
+
+            var invalidStudentException =
+                new InvalidStudentException();
+
+            invalidStudentException.AddData(
+                key: nameof(Student.UpdatedDate),
+                values: "Date is not recent");
+
+            var expectedStudentValidatonException =
+                new StudentValidationException(invalidStudentException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<Student> modifyStudentTask =
+                this.studentService.ModifyStudentAsync(randomStudent);
+
+            StudentValidationException actualStudentValidationException =
+                await Assert.ThrowsAsync<StudentValidationException>(
+                    modifyStudentTask.AsTask);
+
+            // then
+            actualStudentValidationException.Should().BeEquivalentTo(expectedStudentValidatonException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedStudentValidatonException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectStudentByIdAsync(It.IsAny<Guid>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
         }
     }
 }
