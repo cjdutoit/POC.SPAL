@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -60,6 +61,34 @@ namespace POC.SPAL.Api.Controllers
                     this.studentService.RetrieveAllStudents();
 
                 return Ok(retrievedStudents);
+            }
+            catch (StudentDependencyException studentDependencyException)
+            {
+                return InternalServerError(studentDependencyException);
+            }
+            catch (StudentServiceException studentServiceException)
+            {
+                return InternalServerError(studentServiceException);
+            }
+        }
+
+        [HttpGet("{studentId}")]
+        public async ValueTask<ActionResult<Student>> GetStudentByIdAsync(Guid studentId)
+        {
+            try
+            {
+                Student student = await this.studentService.RetrieveStudentByIdAsync(studentId);
+
+                return Ok(student);
+            }
+            catch (StudentValidationException studentValidationException)
+                when (studentValidationException.InnerException is NotFoundStudentException)
+            {
+                return NotFound(studentValidationException.InnerException);
+            }
+            catch (StudentValidationException studentValidationException)
+            {
+                return BadRequest(studentValidationException.InnerException);
             }
             catch (StudentDependencyException studentDependencyException)
             {
