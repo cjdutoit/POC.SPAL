@@ -52,5 +52,18 @@ namespace POC.SPAL.Api.Brokers.Storages
 
             return studentEntityEntry.Entity;
         }
+
+        public async ValueTask<Student> DeleteStudentAsync(Student student)
+        {
+            using var broker =
+                new StorageBroker(this.configuration);
+
+            EntityEntry<Student> studentEntityEntry =
+                broker.Students.Remove(student);
+
+            await broker.SaveChangesAsync();
+
+            return studentEntityEntry.Entity;
+        }
     }
 }
