@@ -18,9 +18,12 @@ Startup.cs
             services.AddLogging();
             services.AddControllers();
 
+            // Register the Storage Provider through DI
             services.AddDbContext<EntityFrameworkStorageProvider>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString(name: "DefaultConnection")));
-
+            
+            // Sample of how you can change the config to target any of the other providers 
+            // provided by EF out of the box. See https://learn.microsoft.com/en-us/ef/core/providers/?tabs=dotnet-core-cli
             //services.AddDbContext<EntityFrameworkStorageProvider>(options =>
             //    options.UseInMemoryDatabase(databaseName: "SPAL"));
 
@@ -72,6 +75,7 @@ StorageBroker.cs
 
         public StorageBroker(IStorageAbstractProvider storageAbstractProvider)
         {
+            // The broker are now only aware of the Storage Abstract Provider.  DBContext is abstracted away.
             this.storageAbstractProvider = storageAbstractProvider;
         }
 
@@ -90,6 +94,8 @@ StorageBroker.Students.cs
 ```cs
     public partial class StorageBroker
     {
+        // The broker now runs the methods of the storage abstraction provider
+    
         public async ValueTask<Student> InsertStudentAsync(Student student) =>
             await this.storageAbstractProvider.InsertAsync(student);
 
@@ -108,7 +114,7 @@ StorageBroker.Students.cs
 
 ```
 
-StorageAbstractProvider.cs
+StorageAbstractProvider.cs 
 ```cs
     public class StorageAbstractProvider : IStorageAbstractProvider
     {
@@ -121,6 +127,8 @@ StorageAbstractProvider.cs
 
         public void Dispose() =>
             this.provider.Dispose();
+            
+        // The abstract provider now calls the storage provider that was setup through DI.
 
         public async ValueTask<T> InsertAsync<T>(T @object)
         {
@@ -146,6 +154,7 @@ EntityFrameworkStorageProvider.cs
 ```cs
     public partial class EntityFrameworkStorageProvider : EFxceptionsContext, IStorageProvider
     {
+        // The EntityFrameworkStorageProvider looks the same as what the broker used to look like
 
         private readonly DbContextOptions<EntityFrameworkStorageProvider> dbContextOptions;
 
