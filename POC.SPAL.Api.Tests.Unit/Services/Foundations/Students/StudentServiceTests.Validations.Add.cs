@@ -205,5 +205,63 @@ namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(MinutesBeforeOrAfter))]
+        public async Task ShouldThrowValidationExceptionOnAddIfCreatedDateIsNotRecentAndLogItAsync(
+            int minutesBeforeOrAfter)
+        {
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+
+            DateTimeOffset invalidDateTime =
+                randomDateTimeOffset.AddMinutes(minutesBeforeOrAfter);
+
+            Student randomStudent = CreateRandomStudent(invalidDateTime);
+            Student invalidStudent = randomStudent;
+
+            var invalidStudentException =
+                new InvalidStudentException();
+
+            invalidStudentException.AddData(
+                key: nameof(Student.CreatedDate),
+                values: "Date is not recent");
+
+            var expectedStudentValidationException =
+                new StudentValidationException(invalidStudentException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<Student> addStudentTask =
+                this.studentService.AddStudentAsync(invalidStudent);
+
+            StudentValidationException actualStudentValidationException =
+                await Assert.ThrowsAsync<StudentValidationException>(
+                    addStudentTask.AsTask);
+
+            // then
+            actualStudentValidationException.Should()
+                .BeEquivalentTo(expectedStudentValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once());
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedStudentValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertStudentAsync(It.IsAny<Student>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
