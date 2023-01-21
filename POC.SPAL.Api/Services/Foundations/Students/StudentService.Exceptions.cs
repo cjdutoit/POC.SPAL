@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
 using POC.SPAL.Api.Models.Students;
 using POC.SPAL.Api.Models.Students.Exceptions;
@@ -31,6 +32,13 @@ namespace POC.SPAL.Api.Services.Foundations.Students
 
                 throw CreateAndLogCriticalDependencyException(failedStudentStorageException);
             }
+            catch (DuplicateKeyException duplicateKeyException)
+            {
+                var alreadyExistsStudentException =
+                    new AlreadyExistsStudentException(duplicateKeyException);
+
+                throw CreateAndLogDependencyValidationException(alreadyExistsStudentException);
+            }
         }
 
         private StudentValidationException CreateAndLogValidationException(Xeption exception)
@@ -49,6 +57,16 @@ namespace POC.SPAL.Api.Services.Foundations.Students
             this.loggingBroker.LogCritical(studentDependencyException);
 
             return studentDependencyException;
+        }
+
+        private StudentDependencyValidationException CreateAndLogDependencyValidationException(Xeption exception)
+        {
+            var studentDependencyValidationException =
+                new StudentDependencyValidationException(exception);
+
+            this.loggingBroker.LogError(studentDependencyValidationException);
+
+            return studentDependencyValidationException;
         }
     }
 }
