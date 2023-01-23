@@ -17,16 +17,7 @@ Startup.cs
         {
             services.AddLogging();
             services.AddControllers();
-
-            // Register the Storage Provider through DI
-            services.AddDbContext<EntityFrameworkStorageProvider>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString(name: "DefaultConnection")));
-            
-            // Sample of how you can change the config to target any of the other providers 
-            // provided by EF out of the box. See https://learn.microsoft.com/en-us/ef/core/providers/?tabs=dotnet-core-cli
-            //services.AddDbContext<EntityFrameworkStorageProvider>(options =>
-            //    options.UseInMemoryDatabase(databaseName: "SPAL"));
-
+            services.AddDbContext<EntityFrameworkStorageProvider>().As<IStorageProvider>();
             AddBrokers(services);
             AddServices(services);
 
@@ -63,6 +54,8 @@ Startup.cs
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
             services.AddTransient<ILoggingBroker, LoggingBroker>();
             services.AddTransient<IStorageBroker, StorageBroker>();
+            services.AddTransient<IStorageAbstractProvider, StorageAbstractProvider>();
+            services.AddTransient<IStorageProvider, EntityFrameworkStorageProvider>();
         }
     }
 ```
@@ -156,11 +149,11 @@ EntityFrameworkStorageProvider.cs
     {
         // The EntityFrameworkStorageProvider looks the same as what the broker used to look like
 
-        private readonly DbContextOptions<EntityFrameworkStorageProvider> dbContextOptions;
+private readonly IConfiguration configuration;
 
-        public EntityFrameworkStorageProvider(DbContextOptions<EntityFrameworkStorageProvider> options) : base(options)
+        public EntityFrameworkStorageProvider(IConfiguration configuration)
         {
-            this.dbContextOptions = options;
+            this.configuration = configuration;
             this.Database.Migrate();
         }
 
@@ -172,9 +165,16 @@ EntityFrameworkStorageProvider.cs
             AddStudentConfigurations(modelBuilder);
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            string connectionString = this.configuration.GetConnectionString(name: "DefaultConnection");
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+
         public async ValueTask<T> InsertAsync<T>(T @object)
         {
-            var broker = new EntityFrameworkStorageProvider(dbContextOptions);
+            var broker = new EntityFrameworkStorageProvider(this.configuration);
             broker.Entry(@object).State = EntityState.Added;
             await broker.SaveChangesAsync();
 
@@ -183,7 +183,7 @@ EntityFrameworkStorageProvider.cs
 
         public IQueryable<T> SelectAll<T>() where T : class
         {
-            using var broker = new EntityFrameworkStorageProvider(dbContextOptions);
+            using var broker = new EntityFrameworkStorageProvider(this.configuration);
 
             return broker.Set<T>();
         }
@@ -193,7 +193,7 @@ EntityFrameworkStorageProvider.cs
 
         public async ValueTask<T> UpdateAsync<T>(T @object)
         {
-            var broker = new EntityFrameworkStorageProvider(dbContextOptions);
+            var broker = new EntityFrameworkStorageProvider(this.configuration);
             broker.Entry(@object).State = EntityState.Modified;
             await broker.SaveChangesAsync();
 
@@ -202,7 +202,7 @@ EntityFrameworkStorageProvider.cs
 
         public async ValueTask<T> DeleteAsync<T>(T @object)
         {
-            var broker = new EntityFrameworkStorageProvider(dbContextOptions);
+            var broker = new EntityFrameworkStorageProvider(this.configuration);
             broker.Entry(@object).State = EntityState.Deleted;
             await broker.SaveChangesAsync();
 
