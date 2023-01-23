@@ -10,10 +10,5 @@ using Standard.Providers.Storage.Abstraction;
 namespace Standard.Providers.Storage.EntityFramework
 {
     public partial class EntityFrameworkStorageProvider : EFxceptionsContext, IStorageProvider
-    {
-
-
-
-
-    }
+    { }
 }

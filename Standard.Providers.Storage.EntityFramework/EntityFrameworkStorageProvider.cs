@@ -6,6 +6,7 @@
 
 using EFxceptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Standard.Providers.Storage.Abstraction;
 using Standard.Providers.Storage.EntityFramework.Models.Students;
 
@@ -14,11 +15,11 @@ namespace Standard.Providers.Storage.EntityFramework
     public partial class EntityFrameworkStorageProvider : EFxceptionsContext, IStorageProvider
     {
 
-        private readonly DbContextOptions<EntityFrameworkStorageProvider> dbContextOptions;
+        private readonly IConfiguration configuration;
 
-        public EntityFrameworkStorageProvider(DbContextOptions<EntityFrameworkStorageProvider> options) : base(options)
+        public EntityFrameworkStorageProvider(IConfiguration configuration)
         {
-            this.dbContextOptions = options;
+            this.configuration = configuration;
             this.Database.Migrate();
         }
 
@@ -30,9 +31,16 @@ namespace Standard.Providers.Storage.EntityFramework
             AddStudentConfigurations(modelBuilder);
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            string connectionString = this.configuration.GetConnectionString(name: "DefaultConnection");
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+
         public async ValueTask<T> InsertAsync<T>(T @object)
         {
-            var broker = new EntityFrameworkStorageProvider(dbContextOptions);
+            var broker = new EntityFrameworkStorageProvider(this.configuration);
             broker.Entry(@object).State = EntityState.Added;
             await broker.SaveChangesAsync();
 
@@ -41,7 +49,7 @@ namespace Standard.Providers.Storage.EntityFramework
 
         public IQueryable<T> SelectAll<T>() where T : class
         {
-            using var broker = new EntityFrameworkStorageProvider(dbContextOptions);
+            using var broker = new EntityFrameworkStorageProvider(this.configuration);
 
             return broker.Set<T>();
         }
@@ -51,7 +59,7 @@ namespace Standard.Providers.Storage.EntityFramework
 
         public async ValueTask<T> UpdateAsync<T>(T @object)
         {
-            var broker = new EntityFrameworkStorageProvider(dbContextOptions);
+            var broker = new EntityFrameworkStorageProvider(this.configuration);
             broker.Entry(@object).State = EntityState.Modified;
             await broker.SaveChangesAsync();
 
@@ -60,7 +68,7 @@ namespace Standard.Providers.Storage.EntityFramework
 
         public async ValueTask<T> DeleteAsync<T>(T @object)
         {
-            var broker = new EntityFrameworkStorageProvider(dbContextOptions);
+            var broker = new EntityFrameworkStorageProvider(this.configuration);
             broker.Entry(@object).State = EntityState.Deleted;
             await broker.SaveChangesAsync();
 

@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using POC.SPAL.Api.Brokers.Storages;
+using Standard.Providers.Storage.EntityFramework;
 
 #nullable disable
 
-namespace POC.SPAL.Api.Migrations
+namespace Standard.Providers.Storage.EntityFramework.Migrations
 {
-    [DbContext(typeof(StorageBroker))]
-    partial class StorageBrokerModelSnapshot : ModelSnapshot
+    [DbContext(typeof(EntityFrameworkStorageProvider))]
+    [Migration("20230123190535_StudentModel")]
+    partial class StudentModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace POC.SPAL.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("POC.SPAL.Api.Models.Students.Student", b =>
+            modelBuilder.Entity("Standard.Providers.Storage.EntityFramework.Models.Students.Student", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,6 +50,7 @@ namespace POC.SPAL.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MiddleName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UpdatedByUserId")

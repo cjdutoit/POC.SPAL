@@ -4,9 +4,9 @@
 // See License.txt in the project root for license information.
 // ---------------------------------------------------------------
 
+using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,15 +34,9 @@ namespace POC.SPAL.Api
         {
             services.AddLogging();
             services.AddControllers();
-
-            services.AddDbContext<EntityFrameworkStorageProvider>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString(name: "DefaultConnection")));
-
-            //services.AddDbContext<EntityFrameworkStorageProvider>(options =>
-            //    options.UseInMemoryDatabase(databaseName: "SPAL"));
-
+            services.AddDbContext<EntityFrameworkStorageProvider>().As<IStorageProvider>();
             AddBrokers(services);
-            AddServices(services);
+            AddServices(services, this.Configuration);
 
             services.AddSwaggerGen(c =>
             {
@@ -65,10 +59,8 @@ namespace POC.SPAL.Api
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
-        private static void AddServices(IServiceCollection services)
+        private static void AddServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<IStorageAbstractProvider, StorageAbstractProvider>();
-            services.AddTransient<IStorageProvider, EntityFrameworkStorageProvider>();
             services.AddTransient<IStudentService, StudentService>();
         }
 
@@ -77,6 +69,8 @@ namespace POC.SPAL.Api
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
             services.AddTransient<ILoggingBroker, LoggingBroker>();
             services.AddTransient<IStorageBroker, StorageBroker>();
+            services.AddTransient<IStorageAbstractProvider, StorageAbstractProvider>();
+            services.AddTransient<IStorageProvider, EntityFrameworkStorageProvider>();
         }
     }
 }
