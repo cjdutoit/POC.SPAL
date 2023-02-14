@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using POC.SPAL.Api.Models.Students;
 using POC.SPAL.Api.Models.Students.Exceptions;
+using Standard.Providers.Storage.EntityFramework.Models.Students;
 using Xeptions;
 
 namespace POC.SPAL.Api.Services.Foundations.Students

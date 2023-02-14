@@ -8,10 +8,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using POC.SPAL.Api.Models.Students;
 using POC.SPAL.Api.Models.Students.Exceptions;
 using POC.SPAL.Api.Services.Foundations.Students;
 using RESTFulSense.Controllers;
+using Standard.Providers.Storage.EntityFramework.Models.Students;
 
 namespace POC.SPAL.Api.Controllers
 {

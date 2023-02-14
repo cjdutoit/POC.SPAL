@@ -6,32 +6,23 @@
 
 using EFxceptions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Standard.Providers.Storage.Abstraction;
 
 namespace POC.SPAL.Api.Brokers.Storages
 {
     public partial class StorageBroker : EFxceptionsContext, IStorageBroker
     {
-        private readonly IConfiguration configuration;
+        private readonly IStorageAbstractProvider storageAbstractProvider;
 
-        public StorageBroker(IConfiguration configuration)
+        public StorageBroker(IStorageAbstractProvider storageAbstractProvider)
         {
-            this.configuration = configuration;
-            Database.Migrate();
+            this.storageAbstractProvider = storageAbstractProvider;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             AddStudentConfigurations(modelBuilder);
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            string connectionString = configuration
-                .GetConnectionString(name: "DefaultConnection");
-
-            optionsBuilder.UseSqlServer(connectionString);
         }
 
         public override void Dispose() { }

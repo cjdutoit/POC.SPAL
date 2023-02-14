@@ -4,6 +4,7 @@
 // See License.txt in the project root for license information.
 // ---------------------------------------------------------------
 
+using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,9 @@ using POC.SPAL.Api.Brokers.DateTimes;
 using POC.SPAL.Api.Brokers.Loggings;
 using POC.SPAL.Api.Brokers.Storages;
 using POC.SPAL.Api.Services.Foundations.Students;
+using Standard.Providers.Storage;
+using Standard.Providers.Storage.Abstraction;
+using Standard.Providers.Storage.EntityFramework;
 
 namespace POC.SPAL.Api
 {
@@ -30,9 +34,9 @@ namespace POC.SPAL.Api
         {
             services.AddLogging();
             services.AddControllers();
-            services.AddDbContext<StorageBroker>();
+            services.AddDbContext<EntityFrameworkStorageProvider>().As<IStorageProvider>();
             AddBrokers(services);
-            AddServices(services);
+            AddServices(services, this.Configuration);
 
             services.AddSwaggerGen(c =>
             {
@@ -55,7 +59,7 @@ namespace POC.SPAL.Api
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
-        private static void AddServices(IServiceCollection services)
+        private static void AddServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddTransient<IStudentService, StudentService>();
         }
@@ -65,6 +69,8 @@ namespace POC.SPAL.Api
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
             services.AddTransient<ILoggingBroker, LoggingBroker>();
             services.AddTransient<IStorageBroker, StorageBroker>();
+            services.AddTransient<IStorageAbstractProvider, StorageAbstractProvider>();
+            services.AddTransient<IStorageProvider, EntityFrameworkStorageProvider>();
         }
     }
 }

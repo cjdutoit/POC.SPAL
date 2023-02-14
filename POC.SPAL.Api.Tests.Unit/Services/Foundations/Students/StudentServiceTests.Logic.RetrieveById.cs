@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Force.DeepCloner;
 using Moq;
-using POC.SPAL.Api.Models.Students;
+using Standard.Providers.Storage.EntityFramework.Models.Students;
 using Xunit;
 
 namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students

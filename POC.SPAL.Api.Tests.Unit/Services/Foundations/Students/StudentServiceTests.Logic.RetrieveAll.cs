@@ -7,7 +7,7 @@
 using System.Linq;
 using FluentAssertions;
 using Moq;
-using POC.SPAL.Api.Models.Students;
+using Standard.Providers.Storage.EntityFramework.Models.Students;
 using Xunit;
 
 namespace POC.SPAL.Api.Tests.Unit.Services.Foundations.Students

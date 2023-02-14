@@ -5,8 +5,8 @@
 // ---------------------------------------------------------------
 
 using System;
-using POC.SPAL.Api.Models.Students;
 using POC.SPAL.Api.Models.Students.Exceptions;
+using Standard.Providers.Storage.EntityFramework.Models.Students;
 
 namespace POC.SPAL.Api.Services.Foundations.Students
 {

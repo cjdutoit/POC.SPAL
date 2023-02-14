@@ -4,9 +4,7 @@
 // See License.txt in the project root for license information.
 // ---------------------------------------------------------------
 
-using System;
-
-namespace POC.SPAL.Api.Models.Students
+namespace Standard.Providers.Storage.EntityFramework.Models.Students
 {
     public class Student
     {
